@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using PortfolioSmarts.Domain.Interfaces;
+using PortfolioSmarts.Domain.Portfolio;
 
-namespace PortfolioSmarts.Domain
+namespace PortfolioSmarts.Domain.Analysis
 {
 	[DebuggerDisplay("{Value.Name, Weight}")]
 	public class CategoryWeight : IDomainEntity

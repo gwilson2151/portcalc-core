@@ -2,7 +2,7 @@
 using System.Globalization;
 using PortfolioSmarts.Domain.Interfaces;
 
-namespace PortfolioSmarts.Domain
+namespace PortfolioSmarts.Domain.Portfolio
 {
 	[DebuggerDisplay("{Exchange}:{Symbol}")]
 	public class Security : IDomainEntity

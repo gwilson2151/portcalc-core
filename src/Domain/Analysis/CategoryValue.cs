@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using PortfolioSmarts.Domain.Interfaces;
 
-namespace PortfolioSmarts.Domain
+namespace PortfolioSmarts.Domain.Analysis
 {
 	[DebuggerDisplay("{Name}")]
 	public class CategoryValue : IDomainEntity

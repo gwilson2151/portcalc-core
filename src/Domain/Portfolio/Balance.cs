@@ -1,7 +1,7 @@
 using PortfolioSmarts.Domain.Enumerations;
 using PortfolioSmarts.Domain.Interfaces;
 
-namespace PortfolioSmarts.Domain
+namespace PortfolioSmarts.Domain.Portfolio
 {
 	public class Balance : IDomainEntity
 	{

@@ -1,4 +1,4 @@
-﻿namespace PortfolioSmarts.Domain
+﻿namespace PortfolioSmarts.Domain.Enumerations
 {
 	public enum TransactionType
 	{

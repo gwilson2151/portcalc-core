@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using PortfolioSmarts.Domain.Interfaces;
 
-namespace PortfolioSmarts.Domain
+namespace PortfolioSmarts.Domain.Portfolio
 {
 	[DebuggerDisplay("Security={Security.Symbol} Shares={Shares}")]
 	public class Position : IDomainEntity

@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using PortfolioSmarts.Domain;
+using PortfolioSmarts.Domain.Analysis;
+using PortfolioSmarts.Domain.Portfolio;
 
 namespace PortfolioSmarts.PortfolioApp
 {
