@@ -8,7 +8,7 @@ namespace PortfolioSmarts.PortfolioApp
 	{
 		private readonly QuestradeApi _api;
 		private readonly PortfolioService _portfolioService;
-		
+
 		private Program()
 		{
 			_api = new QuestradeApi(new QuestradeClient());
@@ -19,27 +19,56 @@ namespace PortfolioSmarts.PortfolioApp
 		{
 			char op;
 			var program = new Program();
-			program.InitialiseApi().Wait();
+			var questradeInitialised = false;
+			Action initialiseQuestrade = () =>
+			{
+				if (!questradeInitialised)
+				{
+					questradeInitialised = true;
+					program.InitialiseApi().Wait();
+				}
+			};
 
-			do {
+			do
+			{
 				Console.WriteLine("Perform an operation by pressing its key:");
+				Console.WriteLine("  [L]oad Portfolio Definition");
 				Console.WriteLine("  [S]how Accounts");
 				Console.WriteLine("  Calculate [W]eights");
 				Console.WriteLine("  E[x]it");
 
 				op = Console.ReadKey(true).KeyChar;
 
-				if (op == 's') {
+				if (op == 's')
+				{
+					initialiseQuestrade();
 					var task = program._portfolioService.ShowAccountsAsync();
 					task.Wait();
 					Console.WriteLine(task.Result);
-				} else if (op == 'w') {
+				}
+				else if (op == 'w')
+				{
+					initialiseQuestrade();
 					var task = program._portfolioService.CalculateWeightsAsync();
 					task.Wait();
 					Console.WriteLine(task.Result);
-				} else if (op == 'x') {
+				}
+				else if (op == 'x')
+				{
 					Console.WriteLine("Exiting.");
-				} else {
+				}
+				else if (op == 'l')
+				{
+					var factory = new PortfolioDefinition.PortfolioDefinitionFactory("file", new PortfolioDefinition.PortfolioDefinitionConfiguration());
+					var processManager = new PortfolioDefinition.PortfolioProcessManager(factory);
+					var task = processManager.GetPortfolioDefinition();
+					task.Wait();
+					var portfolioDefinition = task.Result;
+					Console.WriteLine(portfolioDefinition.Name);
+					Console.WriteLine(portfolioDefinition.Services);
+				}
+				else
+				{
 					Console.WriteLine($"No operation for [{op}].");
 				}
 

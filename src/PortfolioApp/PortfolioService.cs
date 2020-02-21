@@ -4,10 +4,13 @@ using System.Threading.Tasks;
 using PortfolioSmarts.Domain.Portfolio;
 using PortfolioSmarts.Questrade.Interfaces;
 
-namespace PortfolioSmarts.PortfolioApp {
-	public class PortfolioService {
+namespace PortfolioSmarts.PortfolioApp
+{
+	public class PortfolioService
+	{
 		private readonly IQuestradeApi _questradeApi;
-		public PortfolioService(IQuestradeApi questradeApi) {
+		public PortfolioService(IQuestradeApi questradeApi)
+		{
 			_questradeApi = questradeApi;
 		}
 
@@ -41,8 +44,10 @@ namespace PortfolioSmarts.PortfolioApp {
 				}
 
 				var balances = await balancesTask;
-				foreach (var balance in balances) {
-					if (balance.Amount > 0M) {
+				foreach (var balance in balances)
+				{
+					if (balance.Amount > 0M)
+					{
 						total += balance.Amount;
 						sb.AppendLine($"  {balance.Currency.ToString()}    = {balance.Amount.ToString("F2")}");
 					}
@@ -55,7 +60,8 @@ namespace PortfolioSmarts.PortfolioApp {
 			return resultBuilder.ToString();
 		}
 
-		public async Task<string> CalculateWeightsAsync() {
+		public async Task<string> CalculateWeightsAsync()
+		{
 			System.Text.StringBuilder resultBuilder = new System.Text.StringBuilder();
 			var total = 0M;
 			var loader = new HardCodedLoader();
@@ -70,14 +76,18 @@ namespace PortfolioSmarts.PortfolioApp {
 			var loadPositionsTasks = accounts.Select(a => LoadPositions(a));
 			var loadBalancesTasks = accounts.Select(a => LoadBalances(a));
 			var weights = await weightsTask;
-			foreach (var accountPositionTask in loadPositionsTasks) {
+			foreach (var accountPositionTask in loadPositionsTasks)
+			{
 				var account = await accountPositionTask;
-				foreach (var position in account.Positions) {
+				foreach (var position in account.Positions)
+				{
 					decimal currentValue;
 					if (position.ExtraData.TryGetValue("CurrentValue", out var outVar))
 					{
 						currentValue = Convert.ToDecimal(outVar);
-					} else {
+					}
+					else
+					{
 						resultBuilder.AppendLine($"{position.Security.Symbol} has no value in {position.Account.Name}.");
 						continue;
 					}
@@ -87,16 +97,19 @@ namespace PortfolioSmarts.PortfolioApp {
 				}
 			}
 
-			foreach (var accountBalanceTask in loadBalancesTasks) {
+			foreach (var accountBalanceTask in loadBalancesTasks)
+			{
 				var account = await accountBalanceTask;
-				foreach (var balance in account.Balances) {
+				foreach (var balance in account.Balances)
+				{
 					var weight = weights[balance.Currency.ToString()].Where(w => w.Value.Category == portfolioCategory).Single();
 					weightCalc[weight.Value] = weightCalc[weight.Value] + balance.Amount;
 					total += balance.Amount;
 				}
 			}
 
-			foreach (var kvp in weightCalc) {
+			foreach (var kvp in weightCalc)
+			{
 				resultBuilder.AppendLine($"{kvp.Key.Name,-20} - {kvp.Value.ToString("F2"),9} - {(kvp.Value / total).ToString("P"),6}");
 			}
 			resultBuilder.AppendLine($"Total                - {total.ToString("F2"),9}");
@@ -104,7 +117,8 @@ namespace PortfolioSmarts.PortfolioApp {
 			return resultBuilder.ToString();
 		}
 
-		private async Task<Account> LoadPositions(Account account) {
+		private async Task<Account> LoadPositions(Account account)
+		{
 			var loadedAccount = new Account(account);
 
 			var positions = await _questradeApi.GetPositionsAsync(loadedAccount);
@@ -113,7 +127,8 @@ namespace PortfolioSmarts.PortfolioApp {
 			return loadedAccount;
 		}
 
-		private async Task<Account> LoadBalances(Account account) {
+		private async Task<Account> LoadBalances(Account account)
+		{
 			var loadedAccount = new Account(account);
 
 			var balances = await _questradeApi.GetBalancesAsync(loadedAccount);
