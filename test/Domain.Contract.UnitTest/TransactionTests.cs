@@ -1,4 +1,4 @@
-using PortfolioSmarts.Domain;
+using PortfolioSmarts.Domain.Contract.Portfolio;
 using System;
 using Xunit;
 
