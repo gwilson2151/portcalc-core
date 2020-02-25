@@ -19,14 +19,10 @@ namespace PortfolioSmarts.PortfolioApp
 		{
 			char op;
 			var program = new Program();
-			var questradeInitialised = false;
 			Action initialiseQuestrade = () =>
 			{
-				if (!questradeInitialised)
-				{
-					questradeInitialised = true;
-					program.InitialiseApi().Wait();
-				}
+				program.InitialiseApi().Wait();
+				initialiseQuestrade = () => {};
 			};
 
 			do
@@ -53,10 +49,6 @@ namespace PortfolioSmarts.PortfolioApp
 					task.Wait();
 					Console.WriteLine(task.Result);
 				}
-				else if (op == 'x')
-				{
-					Console.WriteLine("Exiting.");
-				}
 				else if (op == 'l')
 				{
 					var factory = new PortfolioDefinition.PortfolioDefinitionFactory("file", new PortfolioDefinition.PortfolioDefinitionConfiguration());
@@ -66,6 +58,10 @@ namespace PortfolioSmarts.PortfolioApp
 					var portfolioDefinition = task.Result;
 					Console.WriteLine(portfolioDefinition.Name);
 					Console.WriteLine(portfolioDefinition.Services);
+				}
+				else if (op == 'x')
+				{
+					Console.WriteLine("Exiting.");
 				}
 				else
 				{
