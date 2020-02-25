@@ -3,6 +3,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Questrade\Questrade.csproj" />
     <ProjectReference Include="..\Domain\Contract\Contract.csproj" />
+    <ProjectReference Include="..\Domain\Portfolio\Portfolio.csproj" />
+    <ProjectReference Include="..\Portfolio.Console\Portfolio.Console.csproj" />
+    <ProjectReference Include="..\Portfolio.FileSystem\Portfolio.FileSystem.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

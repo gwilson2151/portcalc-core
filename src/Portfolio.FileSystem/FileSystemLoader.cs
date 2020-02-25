@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using PortfolioSmarts.Domain.Portfolio.Interfaces;
 
-namespace PortfolioSmarts.PortfolioApp.PortfolioDefinition.Loaders
+namespace PortfolioSmarts.Portfolio.FileSystem
 {
 	public class FileSystemLoader : IPortfolioDefinitionLoader
 	{

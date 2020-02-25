@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using PortfolioSmarts.Portfolio.Console;
+using PortfolioSmarts.PortfolioApp.Portfolio;
 using PortfolioSmarts.Questrade;
 
 namespace PortfolioSmarts.PortfolioApp
@@ -51,8 +53,8 @@ namespace PortfolioSmarts.PortfolioApp
 				}
 				else if (op == 'l')
 				{
-					var factory = new PortfolioDefinition.PortfolioDefinitionFactory("file", new PortfolioDefinition.PortfolioDefinitionConfiguration());
-					var processManager = new PortfolioDefinition.PortfolioProcessManager(factory);
+					var factory = new PortfolioDefinitionFactory("file", new PortfolioDefinitionConfiguration());
+					var processManager = new PortfolioProcessManager(factory);
 					var task = processManager.GetPortfolioDefinition();
 					task.Wait();
 					var portfolioDefinition = task.Result;

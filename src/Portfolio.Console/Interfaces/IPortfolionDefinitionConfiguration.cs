@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace PortfolioSmarts.PortfolioApp.PortfolioDefinition
+namespace PortfolioSmarts.Portfolio.Console.Interfaces
 {
 	public interface IPortfolioDefinitionConfiguration
 	{

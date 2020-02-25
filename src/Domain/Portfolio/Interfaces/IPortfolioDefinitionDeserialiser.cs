@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace PortfolioSmarts.PortfolioApp.PortfolioDefinition
+namespace PortfolioSmarts.Domain.Portfolio.Interfaces
 {
 	public interface IPortfolioDefinitionDeserialiser
 	{

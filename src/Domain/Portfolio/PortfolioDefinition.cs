@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PortfolioSmarts.PortfolioApp.PortfolioDefinition
+namespace PortfolioSmarts.Domain.Portfolio
 {
 	public class PortfolioDefinition
 	{

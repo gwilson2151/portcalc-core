@@ -1,6 +1,10 @@
 using System.Threading.Tasks;
+using PortfolioSmarts.Domain.Portfolio;
+using PortfolioSmarts.Domain.Portfolio.Interfaces;
+using PortfolioSmarts.Portfolio.Console.Interfaces;
+using PortfolioSmarts.Portfolio.FileSystem;
 
-namespace PortfolioSmarts.PortfolioApp.PortfolioDefinition
+namespace PortfolioSmarts.PortfolioApp.Portfolio
 {
 	public class PortfolioDefinitionFactory : IPortfolioDefinitionFactory
 	{
@@ -26,8 +30,8 @@ namespace PortfolioSmarts.PortfolioApp.PortfolioDefinition
 
 		private IPortfolioDefinitionDeserialiser GetFileDeserialiser(string filePath)
 		{
-			var loader = new Loaders.FileSystemLoader(filePath);
-			return new PortfolioDefinitionDeserialiser(loader);
+			var loader = new FileSystemLoader(filePath);
+			return new PortfolioDefinitionJsonDeserialiser(loader);
 		}
 	}
 }

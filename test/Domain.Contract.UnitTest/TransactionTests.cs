@@ -2,7 +2,7 @@ using PortfolioSmarts.Domain;
 using System;
 using Xunit;
 
-namespace Domain.UnitTest
+namespace Domain.Contract.UnitTest
 {
 	public class TransactionTests
 	{

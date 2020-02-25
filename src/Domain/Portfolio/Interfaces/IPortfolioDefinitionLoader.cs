@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace PortfolioSmarts.PortfolioApp.PortfolioDefinition.Loaders
+namespace PortfolioSmarts.Domain.Portfolio.Interfaces
 {
 	public interface IPortfolioDefinitionLoader
 	{

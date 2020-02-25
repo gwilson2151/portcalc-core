@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
+using PortfolioSmarts.Domain.Portfolio;
+using PortfolioSmarts.Domain.Portfolio.Interfaces;
 
-namespace PortfolioSmarts.PortfolioApp.PortfolioDefinition
+namespace PortfolioSmarts.PortfolioApp.Portfolio
 {
 	public class PortfolioProcessManager
 	{
