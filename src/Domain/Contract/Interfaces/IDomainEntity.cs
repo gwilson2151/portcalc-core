@@ -1,4 +1,4 @@
-﻿namespace PortfolioSmarts.Domain.Interfaces
+﻿namespace PortfolioSmarts.Domain.Contract.Interfaces
 {
 	public interface IDomainEntity
 	{

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using PortfolioSmarts.Domain.Portfolio;
+using PortfolioSmarts.Domain.Contract.Portfolio;
 
 namespace PortfolioSmarts.Questrade.Interfaces {
 	public interface IQuestradeApi

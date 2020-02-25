@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
-using PortfolioSmarts.Domain.Interfaces;
+using PortfolioSmarts.Domain.Contract.Interfaces;
 
-namespace PortfolioSmarts.Domain.Portfolio
+namespace PortfolioSmarts.Domain.Contract.Portfolio
 {
 	[DebuggerDisplay("{Exchange}:{Symbol}")]
 	public class Security : IDomainEntity

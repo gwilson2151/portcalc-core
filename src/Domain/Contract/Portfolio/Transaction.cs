@@ -1,8 +1,8 @@
 ﻿using System;
-using PortfolioSmarts.Domain.Enumerations;
-using PortfolioSmarts.Domain.Interfaces;
+using PortfolioSmarts.Domain.Contract.Enumerations;
+using PortfolioSmarts.Domain.Contract.Interfaces;
 
-namespace PortfolioSmarts.Domain.Portfolio
+namespace PortfolioSmarts.Domain.Contract.Portfolio
 {
 	public class Transaction : IDomainEntity
 	{

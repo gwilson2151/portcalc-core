@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using PortfolioSmarts.Domain.Portfolio;
+using PortfolioSmarts.Domain.Contract.Portfolio;
 using PortfolioSmarts.Questrade.Interfaces;
 
 namespace PortfolioSmarts.PortfolioApp

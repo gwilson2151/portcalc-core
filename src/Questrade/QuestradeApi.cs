@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortfolioSmarts.Domain.Portfolio;
-using PortfolioSmarts.Domain.Enumerations;
+using PortfolioSmarts.Domain.Contract.Portfolio;
+using PortfolioSmarts.Domain.Contract.Enumerations;
 using PortfolioSmarts.Questrade.Interfaces;
 
 namespace PortfolioSmarts.Questrade

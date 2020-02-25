@@ -1,4 +1,4 @@
-﻿namespace PortfolioSmarts.Domain.Enumerations
+﻿namespace PortfolioSmarts.Domain.Contract.Enumerations
 {
 	public enum Period
 	{
