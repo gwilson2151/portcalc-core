@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using PortfolioSmarts.Domain.Interfaces;
+using PortfolioSmarts.Domain.Contract.Interfaces;
 
-namespace PortfolioSmarts.Domain
+namespace PortfolioSmarts.Domain.Contract.Portfolio
 {
 	public class Account : IDomainEntity
 	{

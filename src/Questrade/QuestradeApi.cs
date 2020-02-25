@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortfolioSmarts.Domain;
-using PortfolioSmarts.Domain.Enumerations;
+using PortfolioSmarts.Domain.Contract.Portfolio;
+using PortfolioSmarts.Domain.Contract.Enumerations;
+using PortfolioSmarts.Questrade.Interfaces;
 
 namespace PortfolioSmarts.Questrade
 {
-	public class QuestradeApi
+	public class QuestradeApi : IQuestradeApi
 	{
 		private readonly QuestradeClient _client;
 		private SessionState _sessionState;
@@ -19,10 +20,13 @@ namespace PortfolioSmarts.Questrade
 
 		public async Task Initialise(string refreshToken)
 		{
+			if (string.IsNullOrWhiteSpace(refreshToken)) {
+				throw new ArgumentException("Value cannot be null, empty, or white space.", nameof(refreshToken));
+			}
 			_sessionState = await _client.Authenticate(refreshToken);
 		}
 
-		public async Task<IEnumerable<Account>> GetAccounts()
+		public async Task<IEnumerable<Account>> GetAccountsAsync()
 		{
 			await EnsureSessionAuthentication();
 
@@ -34,7 +38,7 @@ namespace PortfolioSmarts.Questrade
 			});
 		}
 
-		public async Task<IEnumerable<Position>> GetPositions(Account account)
+		public async Task<IEnumerable<Position>> GetPositionsAsync(Account account)
 		{
 			await EnsureSessionAuthentication();
 
@@ -53,7 +57,7 @@ namespace PortfolioSmarts.Questrade
 			});
 		}
 
-		public async Task<IEnumerable<Balance>> GetBalances(Account account) {
+		public async Task<IEnumerable<Balance>> GetBalancesAsync(Account account) {
 			await EnsureSessionAuthentication();
 
 			var qBalances = await _client.GetBalances(_sessionState, account.ExternalId);
