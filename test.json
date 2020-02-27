@@ -1,4 +1,13 @@
 {
 	"Name": "Test",
-	"Services": []
+	"Services": [
+		{
+			"Name": "TestService1",
+			"Type": "ServiceType1"
+		},
+		{
+			"Name": "TestService2",
+			"Type": "ServiceType2"
+		}
+	]
 }

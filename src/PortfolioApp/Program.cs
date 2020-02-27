@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using PortfolioSmarts.Domain.Portfolio.Interfaces;
 using PortfolioSmarts.Portfolio.Console;
+using PortfolioSmarts.Portfolio.Console.Interfaces;
 using PortfolioSmarts.PortfolioApp.Portfolio;
 using PortfolioSmarts.Questrade;
 
@@ -8,6 +11,7 @@ namespace PortfolioSmarts.PortfolioApp
 {
 	class Program
 	{
+		private static IServiceProvider _serviceProvider;
 		private readonly QuestradeApi _api;
 		private readonly PortfolioService _portfolioService;
 
@@ -19,59 +23,93 @@ namespace PortfolioSmarts.PortfolioApp
 
 		private static void Main(string[] args)
 		{
-			char op;
-			var program = new Program();
-			Action initialiseQuestrade = () =>
+			RegisterServices();
+
+			try
 			{
-				program.InitialiseApi().Wait();
-				initialiseQuestrade = () => {};
-			};
+				char op;
+				var program = new Program();
+				Action initialiseQuestrade = () =>
+				{
+					program.InitialiseApi().Wait();
+					initialiseQuestrade = () => { };
+				};
 
-			do
+				do
+				{
+					Console.WriteLine("Perform an operation by pressing its key:");
+					Console.WriteLine("  [L]oad Portfolio Definition");
+					Console.WriteLine("  [S]how Accounts");
+					Console.WriteLine("  Calculate [W]eights");
+					Console.WriteLine("  E[x]it");
+
+					op = Console.ReadKey(true).KeyChar;
+
+					if (op == 's')
+					{
+						initialiseQuestrade();
+						var task = program._portfolioService.ShowAccountsAsync();
+						task.Wait();
+						Console.WriteLine(task.Result);
+					}
+					else if (op == 'w')
+					{
+						initialiseQuestrade();
+						var task = program._portfolioService.CalculateWeightsAsync();
+						task.Wait();
+						Console.WriteLine(task.Result);
+					}
+					else if (op == 'l')
+					{
+						var processManager = _serviceProvider.GetService<PortfolioProcessManager>();
+						var task = processManager.GetPortfolioDefinition();
+						task.Wait();
+						var portfolioDefinition = task.Result;
+						Console.WriteLine(portfolioDefinition.Name);
+						foreach (var service in portfolioDefinition.Services)
+						{
+							Console.WriteLine($"{service.Name}[{service.Type}]");
+						}
+					}
+					else if (op == 'x')
+					{
+						Console.WriteLine("Exiting.");
+					}
+					else
+					{
+						Console.WriteLine($"No operation for [{op}].");
+					}
+
+					Console.WriteLine();
+				} while (op != 'x');
+			}
+			finally
 			{
-				Console.WriteLine("Perform an operation by pressing its key:");
-				Console.WriteLine("  [L]oad Portfolio Definition");
-				Console.WriteLine("  [S]how Accounts");
-				Console.WriteLine("  Calculate [W]eights");
-				Console.WriteLine("  E[x]it");
+				DisposeServices();
+			}
+		}
 
-				op = Console.ReadKey(true).KeyChar;
+		private static void RegisterServices()
+		{
+			var collection = new ServiceCollection();
+			collection.AddSingleton(new ProgramConfiguration
+			{
+				DefinitionLoaderType = "file",
+				DefinitionFilePath = "..\\test.json"
+			});
+			collection.AddSingleton<IPortfolioDefinitionConfiguration, PortfolioDefinitionConfiguration>();
+			collection.AddSingleton<IPortfolioDefinitionFactory, PortfolioDefinitionFactory>();
+			collection.AddSingleton<PortfolioProcessManager>();
 
-				if (op == 's')
-				{
-					initialiseQuestrade();
-					var task = program._portfolioService.ShowAccountsAsync();
-					task.Wait();
-					Console.WriteLine(task.Result);
-				}
-				else if (op == 'w')
-				{
-					initialiseQuestrade();
-					var task = program._portfolioService.CalculateWeightsAsync();
-					task.Wait();
-					Console.WriteLine(task.Result);
-				}
-				else if (op == 'l')
-				{
-					var factory = new PortfolioDefinitionFactory("file", new PortfolioDefinitionConfiguration());
-					var processManager = new PortfolioProcessManager(factory);
-					var task = processManager.GetPortfolioDefinition();
-					task.Wait();
-					var portfolioDefinition = task.Result;
-					Console.WriteLine(portfolioDefinition.Name);
-					Console.WriteLine(portfolioDefinition.Services);
-				}
-				else if (op == 'x')
-				{
-					Console.WriteLine("Exiting.");
-				}
-				else
-				{
-					Console.WriteLine($"No operation for [{op}].");
-				}
+			_serviceProvider = collection.BuildServiceProvider();
+		}
 
-				Console.WriteLine();
-			} while (op != 'x');
+		private static void DisposeServices()
+		{
+			if (_serviceProvider != null && _serviceProvider is IDisposable)
+			{
+				((IDisposable)_serviceProvider).Dispose();
+			}
 		}
 
 		private async Task InitialiseApi()

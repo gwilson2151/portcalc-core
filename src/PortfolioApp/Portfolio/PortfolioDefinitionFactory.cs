@@ -8,18 +8,18 @@ namespace PortfolioSmarts.PortfolioApp.Portfolio
 {
 	public class PortfolioDefinitionFactory : IPortfolioDefinitionFactory
 	{
-		private readonly string _type;
+		private readonly ProgramConfiguration _programConfig;
 		private readonly IPortfolioDefinitionConfiguration _configuration;
 
-		public PortfolioDefinitionFactory(string type, IPortfolioDefinitionConfiguration configuration)
+		public PortfolioDefinitionFactory(ProgramConfiguration programConfig, IPortfolioDefinitionConfiguration configuration)
 		{
-			_type = type;
+			_programConfig = programConfig;
 			_configuration = configuration;
 		}
 
 		public async Task<IPortfolioDefinitionDeserialiser> GetDeserialiser()
 		{
-			if (_type == "file")
+			if (_programConfig.DefinitionLoaderType == "file")
 			{
 				var filePath = await _configuration.GetPortfolioDefinitionFilePath();
 				return GetFileDeserialiser(filePath);
