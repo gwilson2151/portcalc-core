@@ -83,7 +83,8 @@ namespace PortfolioSmarts.Questrade
 		{
 			if (_sessionState == null)
 			{
-				throw new Exception("QuestradeApi must be initialised.");
+				var refreshToken = _serviceInitialiser.GetRefreshToken("Questrade");
+				await Initialise(refreshToken);
 			}
 			else if (!_sessionState.SessionValid())
 			{

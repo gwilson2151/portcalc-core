@@ -33,19 +33,19 @@ namespace PortfolioSmarts.PortfolioApp
 
 					op = Console.ReadKey(true).KeyChar;
 
-					if (op == 's')
+					if (op == 's' || op == 'S')
 					{
 						var task = portfolioService.ShowAccountsAsync();
 						task.Wait();
 						Console.WriteLine(task.Result);
 					}
-					else if (op == 'w')
+					else if (op == 'w' || op == 'W')
 					{
 						var task = portfolioService.CalculateWeightsAsync();
 						task.Wait();
 						Console.WriteLine(task.Result);
 					}
-					else if (op == 'l')
+					else if (op == 'l' || op == 'L')
 					{
 						var processManager = _serviceProvider.GetService<PortfolioProcessManager>();
 						var loadPortfolioTask = processManager.LoadPortfolioDefinition();
@@ -61,10 +61,10 @@ namespace PortfolioSmarts.PortfolioApp
 						var serviceAccounts = loadAccountsTask.Result;
 						foreach (var serviceAccount in serviceAccounts)
 						{
-							Console.WriteLine($"account name: {serviceAccount.Account.Name} service name: {serviceAccount.Service.Name} service type: {serviceAccount.Service.Type}");
+							Console.WriteLine($"account name: {serviceAccount.Account.Name} service name: {serviceAccount.Service?.Name} service type: {serviceAccount.Service?.Type}");
 						}
 					}
-					else if (op == 'x')
+					else if (op == 'x' || op == 'X')
 					{
 						Console.WriteLine("Exiting.");
 					}
@@ -88,15 +88,16 @@ namespace PortfolioSmarts.PortfolioApp
 			collection.AddSingleton(new ProgramConfiguration
 			{
 				DefinitionLoaderType = "file",
-				DefinitionFilePath = "..\\test.json"
+				DefinitionFilePath = "test.json"
 			});
 			collection.AddSingleton<IPortfolioDefinitionConfiguration, PortfolioDefinitionConfiguration>();
 			collection.AddSingleton<IPortfolioDefinitionFactory, PortfolioDefinitionFactory>();
 			collection.AddSingleton<PortfolioProcessManager>();
 			collection.AddTransient<IQuestradeApi, QuestradeApi>();
-			collection.AddSingleton<QuestradeClient>(); // I think this is safe but might need to be transient
+			collection.AddSingleton<QuestradeClient>();
 			collection.AddSingleton<ConsoleQuestradeInitialiser>();
 			collection.AddSingleton<ServiceFactory>();
+			collection.AddSingleton<PortfolioService>();
 
 			_serviceProvider = collection.BuildServiceProvider();
 		}
