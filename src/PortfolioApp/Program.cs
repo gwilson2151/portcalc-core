@@ -1,25 +1,18 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using PortfolioSmarts.Domain.Portfolio.Interfaces;
 using PortfolioSmarts.Portfolio.Console;
 using PortfolioSmarts.Portfolio.Console.Interfaces;
 using PortfolioSmarts.PortfolioApp.Portfolio;
+using PortfolioSmarts.PortfolioApp.Services;
 using PortfolioSmarts.Questrade;
+using PortfolioSmarts.Questrade.Interfaces;
 
 namespace PortfolioSmarts.PortfolioApp
 {
 	class Program
 	{
 		private static IServiceProvider _serviceProvider;
-		private readonly QuestradeApi _api;
-		private readonly PortfolioService _portfolioService;
-
-		private Program()
-		{
-			_api = new QuestradeApi(new QuestradeClient());
-			_portfolioService = new PortfolioService(_api);
-		}
 
 		private static void Main(string[] args)
 		{
@@ -28,12 +21,7 @@ namespace PortfolioSmarts.PortfolioApp
 			try
 			{
 				char op;
-				var program = new Program();
-				Action initialiseQuestrade = () =>
-				{
-					program.InitialiseApi().Wait();
-					initialiseQuestrade = () => { };
-				};
+				var portfolioService = _serviceProvider.GetService<PortfolioService>();
 
 				do
 				{
@@ -47,28 +35,33 @@ namespace PortfolioSmarts.PortfolioApp
 
 					if (op == 's')
 					{
-						initialiseQuestrade();
-						var task = program._portfolioService.ShowAccountsAsync();
+						var task = portfolioService.ShowAccountsAsync();
 						task.Wait();
 						Console.WriteLine(task.Result);
 					}
 					else if (op == 'w')
 					{
-						initialiseQuestrade();
-						var task = program._portfolioService.CalculateWeightsAsync();
+						var task = portfolioService.CalculateWeightsAsync();
 						task.Wait();
 						Console.WriteLine(task.Result);
 					}
 					else if (op == 'l')
 					{
 						var processManager = _serviceProvider.GetService<PortfolioProcessManager>();
-						var task = processManager.GetPortfolioDefinition();
-						task.Wait();
-						var portfolioDefinition = task.Result;
+						var loadPortfolioTask = processManager.LoadPortfolioDefinition();
+						loadPortfolioTask.Wait();
+						var portfolioDefinition = loadPortfolioTask.Result;
 						Console.WriteLine(portfolioDefinition.Name);
 						foreach (var service in portfolioDefinition.Services)
 						{
 							Console.WriteLine($"{service.Name}[{service.Type}]");
+						}
+						var loadAccountsTask = processManager.LoadAccounts(portfolioDefinition);
+						loadAccountsTask.Wait();
+						var serviceAccounts = loadAccountsTask.Result;
+						foreach (var serviceAccount in serviceAccounts)
+						{
+							Console.WriteLine($"account name: {serviceAccount.Account.Name} service name: {serviceAccount.Service.Name} service type: {serviceAccount.Service.Type}");
 						}
 					}
 					else if (op == 'x')
@@ -100,6 +93,10 @@ namespace PortfolioSmarts.PortfolioApp
 			collection.AddSingleton<IPortfolioDefinitionConfiguration, PortfolioDefinitionConfiguration>();
 			collection.AddSingleton<IPortfolioDefinitionFactory, PortfolioDefinitionFactory>();
 			collection.AddSingleton<PortfolioProcessManager>();
+			collection.AddTransient<IQuestradeApi, QuestradeApi>();
+			collection.AddSingleton<QuestradeClient>(); // I think this is safe but might need to be transient
+			collection.AddSingleton<ConsoleQuestradeInitialiser>();
+			collection.AddSingleton<ServiceFactory>();
 
 			_serviceProvider = collection.BuildServiceProvider();
 		}
@@ -110,15 +107,6 @@ namespace PortfolioSmarts.PortfolioApp
 			{
 				((IDisposable)_serviceProvider).Dispose();
 			}
-		}
-
-		private async Task InitialiseApi()
-		{
-			Console.Write("Enter refresh token: ");
-			var refreshToken = Console.ReadLine();
-			// todo - ensure non-null, non-empty, non-whitespace token
-			await _api.Initialise(refreshToken);
-			Console.WriteLine("Initialisation done.");
 		}
 	}
 }

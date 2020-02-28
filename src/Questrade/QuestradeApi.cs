@@ -4,18 +4,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using PortfolioSmarts.Domain.Contract.Portfolio;
 using PortfolioSmarts.Domain.Contract.Enumerations;
+using PortfolioSmarts.Domain.Service;
 using PortfolioSmarts.Questrade.Interfaces;
 
 namespace PortfolioSmarts.Questrade
 {
-	public class QuestradeApi : IQuestradeApi
+	public class QuestradeApi : IQuestradeApi, IService
 	{
 		private readonly QuestradeClient _client;
+		private readonly ConsoleQuestradeInitialiser _serviceInitialiser;
 		private SessionState _sessionState;
+		private ServiceDefinition _serviceDefinition;
 
-		public QuestradeApi(QuestradeClient client)
+		public QuestradeApi(QuestradeClient client, ConsoleQuestradeInitialiser serviceInitialiser)
 		{
 			_client = client;
+			_serviceInitialiser = serviceInitialiser;
 		}
 
 		public async Task Initialise(string refreshToken)
@@ -85,6 +89,33 @@ namespace PortfolioSmarts.Questrade
 			{
 				_sessionState = await _client.Authenticate(_sessionState.RefreshToken);
 			}
+		}
+
+		async Task<IEnumerable<ServiceAccount>> IService.GetAccountsAsync()
+		{
+			return (await GetAccountsAsync()).Select(a => new ServiceAccount {
+				Account = a,
+				Service = _serviceDefinition,
+				GetBalancesAsync = () => GetBalancesAsync(a),
+				GetPositionsAsync = () => GetPositionsAsync(a)
+			});
+		}
+
+		Task<IEnumerable<Balance>> IService.GetBalancesAsync(ServiceAccount account)
+		{
+			throw new NotImplementedException();
+		}
+
+		Task<IEnumerable<Position>> IService.GetPositionsAsync(ServiceAccount account)
+		{
+			throw new NotImplementedException();
+		}
+
+		Task IService.Initialise(ServiceDefinition serviceDefinition)
+		{
+			_serviceDefinition = serviceDefinition;
+			var refreshToken = _serviceInitialiser.GetRefreshToken($"{_serviceDefinition.Name}[{_serviceDefinition.Type}]");
+			return Initialise(refreshToken);
 		}
 	}
 }

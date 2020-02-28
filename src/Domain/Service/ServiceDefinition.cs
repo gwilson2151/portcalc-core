@@ -1,4 +1,4 @@
-namespace PortfolioSmarts.Domain.Portfolio
+namespace PortfolioSmarts.Domain.Service
 {
 	public class ServiceDefinition
 	{

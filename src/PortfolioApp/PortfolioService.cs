@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PortfolioSmarts.Domain.Contract.Portfolio;
+using PortfolioSmarts.Domain.Portfolio;
 using PortfolioSmarts.Questrade.Interfaces;
 
 namespace PortfolioSmarts.PortfolioApp
@@ -9,10 +10,11 @@ namespace PortfolioSmarts.PortfolioApp
 	public class PortfolioService
 	{
 		private readonly IQuestradeApi _questradeApi;
-		public PortfolioService(IQuestradeApi questradeApi)
-		{
-			_questradeApi = questradeApi;
-		}
+		private PortfolioDefinition _definition;
+		
+		public PortfolioService(IQuestradeApi questradeApi) => _questradeApi = questradeApi;
+
+		public void SetDefinition(PortfolioDefinition definition) => _definition = definition;
 
 		public async Task<string> ShowAccountsAsync()
 		{
