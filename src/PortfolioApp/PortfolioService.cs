@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PortfolioSmarts.Domain.Contract.Portfolio;
@@ -11,23 +12,26 @@ namespace PortfolioSmarts.PortfolioApp
 	{
 		private readonly IQuestradeApi _questradeApi;
 		private PortfolioDefinition _definition;
-		
+
 		public PortfolioService(IQuestradeApi questradeApi) => _questradeApi = questradeApi;
 
 		public void SetDefinition(PortfolioDefinition definition) => _definition = definition;
 
 		public async Task<string> ShowAccountsAsync()
 		{
-			var accounts = await _questradeApi.GetAccountsAsync();
+			var accounts = await LoadAllPositionsAndBalances(await _questradeApi.GetAccountsAsync());
+			return await ShowAccountsAsync(accounts);
+		}
+
+		public Task<string> ShowAccountsAsync(IEnumerable<Account> accounts)
+		{
 			System.Text.StringBuilder resultBuilder = new System.Text.StringBuilder();
 			resultBuilder.AppendLine($"Accounts{Environment.NewLine}--------");
 			foreach (var account in accounts)
 			{
 				System.Text.StringBuilder sb = new System.Text.StringBuilder();
 				var total = 0M;
-				var balancesTask = _questradeApi.GetBalancesAsync(account);
-				var positions = await _questradeApi.GetPositionsAsync(account);
-				foreach (var position in positions)
+				foreach (var position in account.Positions)
 				{
 					decimal? currentValue = null;
 					if (position.ExtraData.TryGetValue("CurrentValue", out var outVar))
@@ -45,8 +49,7 @@ namespace PortfolioSmarts.PortfolioApp
 					sb.AppendLine($"  {position.Security.Symbol} - {position.Shares} x {priceStr} = {valStr}");
 				}
 
-				var balances = await balancesTask;
-				foreach (var balance in balances)
+				foreach (var balance in account.Balances)
 				{
 					if (balance.Amount > 0M)
 					{
@@ -59,28 +62,29 @@ namespace PortfolioSmarts.PortfolioApp
 				resultBuilder.AppendLine(sb.ToString());
 			}
 
-			return resultBuilder.ToString();
+			return Task.FromResult(resultBuilder.ToString());
 		}
 
 		public async Task<string> CalculateWeightsAsync()
 		{
+			var accounts = await LoadAllPositionsAndBalances(await _questradeApi.GetAccountsAsync());
+			return await CalculateWeightsAsync(accounts);
+		}
+
+		public async Task<string> CalculateWeightsAsync(IEnumerable<Account> accounts)
+		{
 			System.Text.StringBuilder resultBuilder = new System.Text.StringBuilder();
 			var total = 0M;
 			var loader = new HardCodedLoader();
-			var accountsTask = _questradeApi.GetAccountsAsync();
 			var categories = await loader.LoadCategories();
 			var weightsTask = loader.LoadWeights(categories);
 
 			var portfolioCategory = categories.Where(c => c.Id == HardCodedLoader.PortfolioCategoryId).Single();
 			var weightCalc = portfolioCategory.Values.ToDictionary(v => v, v => 0M);
 
-			var accounts = await accountsTask;
-			var loadPositionsTasks = accounts.Select(a => LoadPositions(a));
-			var loadBalancesTasks = accounts.Select(a => LoadBalances(a));
 			var weights = await weightsTask;
-			foreach (var accountPositionTask in loadPositionsTasks)
+			foreach (var account in accounts)
 			{
-				var account = await accountPositionTask;
 				foreach (var position in account.Positions)
 				{
 					decimal currentValue;
@@ -97,11 +101,7 @@ namespace PortfolioSmarts.PortfolioApp
 					weightCalc[weight.Value] = weightCalc[weight.Value] + currentValue;
 					total += currentValue;
 				}
-			}
 
-			foreach (var accountBalanceTask in loadBalancesTasks)
-			{
-				var account = await accountBalanceTask;
 				foreach (var balance in account.Balances)
 				{
 					var weight = weights[balance.Currency.ToString()].Where(w => w.Value.Category == portfolioCategory).Single();
@@ -117,6 +117,13 @@ namespace PortfolioSmarts.PortfolioApp
 			resultBuilder.AppendLine($"Total                - {total.ToString("F2"),9}");
 
 			return resultBuilder.ToString();
+		}
+
+		private async Task<IEnumerable<Account>> LoadAllPositionsAndBalances(IEnumerable<Account> accounts)
+		{
+			var accountsWithPositions = accounts.Select(a => LoadPositions(a));
+			var accountsWithPositionsAndBalances = await Task.WhenAll(accountsWithPositions.Select(async a => LoadBalances(await a)));
+			return await Task.WhenAll(accountsWithPositionsAndBalances);
 		}
 
 		private async Task<Account> LoadPositions(Account account)

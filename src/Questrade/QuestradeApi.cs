@@ -102,14 +102,14 @@ namespace PortfolioSmarts.Questrade
 			});
 		}
 
-		Task<IEnumerable<Balance>> IService.GetBalancesAsync(ServiceAccount account)
+		Task<IEnumerable<Balance>> IService.GetBalancesAsync(ServiceAccount serviceAccount)
 		{
-			throw new NotImplementedException();
+			return GetBalancesAsync(serviceAccount.Account);
 		}
 
-		Task<IEnumerable<Position>> IService.GetPositionsAsync(ServiceAccount account)
+		Task<IEnumerable<Position>> IService.GetPositionsAsync(ServiceAccount serviceAccount)
 		{
-			throw new NotImplementedException();
+			return GetPositionsAsync(serviceAccount.Account);
 		}
 
 		Task IService.Initialise(ServiceDefinition serviceDefinition)
