@@ -18,7 +18,7 @@ The code in the `Contract` library stores the state of the accounts, positions, 
 The code in the `PortfolioService.cs` class is responsible for taking the state of the accounts, positions, and cash balances and printing the summary in the console. It's very imperative and I'd like to build reports that are more generic in the future.
 
 ### Usage
-To use the application you'll need a Questrade account. Assuming you have one, you'll need to have a refresh token from the [App Hub](https://apphub.questrade.com/UI/UserApps.aspx) (or on the website click the user dropdown on the top right of the screen > click App Hub).
+To use the application you'll need a Questrade account. Assuming you have one, you'll need to have a refresh token from the [App Hub](https://apphub.questrade.com/UI/UserApps.aspx)  on the Questrade website > click the user dropdown on the top right of the screen > click App Hub).
 
 #### Visual Studio 2019
 1. Set PortfolioApp as the start up project.
